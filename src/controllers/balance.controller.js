@@ -2,6 +2,10 @@ const { Op } = require("sequelize");
 const { sequelize } = require('../model');
 
 module.exports = {
+    
+    // Here I was not sure if we should compare the profileId from the middleware with the userId,
+    // I didn't do it because it wouldn't make sense to send a userId elsewise
+    // I am assuming  this is some kind of "admin" endpoint to make deposits for a specific user
     depositMoney: async (req, res, next) => {
         try {
             const { Contract, Profile, Job } = req.app.get('models')
