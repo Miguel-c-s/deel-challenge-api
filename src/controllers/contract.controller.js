@@ -22,17 +22,23 @@ module.exports = {
 
     },
 
-    getNonTerminatedContracts: async (req, res) => {
-        const { Contract } = req.app.get('models');
-        const { id: profileId } = req.profile;
+    getNonTerminatedContracts: async (req, res, next) => {
 
-        const contracts = await Contract.findAll({
-            where: {
-                [Op.or]: [{ ContractorId: profileId }, { ClientId: profileId }],
-                status: { [Op.ne]: 'terminated' }
-            }
-        });
+        try {
+            const { Contract } = req.app.get('models');
+            const { id: profileId } = req.profile;
+    
+            const contracts = await Contract.findAll({
+                where: {
+                    [Op.or]: [{ ContractorId: profileId }, { ClientId: profileId }],
+                    status: { [Op.ne]: 'terminated' }
+                }
+            });
+    
+            res.json(contracts);
+        } catch (e) {
+            next(e);
+        }
 
-        res.json(contracts);
     },
 }
