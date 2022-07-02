@@ -68,7 +68,7 @@ module.exports = {
                 res.status(500).send('Your payment could not be processed at this time. Please try again later.');
             }
 
-            res.send(`Job with title \"${job.description}\" was paid successfully. The total value was ${job.price} euros.`) // or send job altertively
+            res.send(`Job with title \"${job.description}\" was paid successfully. The total value was ${job.price}€.`) // or send job altertively
         } catch (e) {
             next(e);
         }
