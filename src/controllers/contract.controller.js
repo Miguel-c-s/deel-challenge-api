@@ -23,6 +23,16 @@ module.exports = {
     },
 
     getNonTerminatedContracts: async (req, res) => {
+        const { Contract } = req.app.get('models');
+        const { id: profileId } = req.profile;
 
+        const contracts = await Contract.findAll({
+            where: {
+                [Op.or]: [{ ContractorId: profileId }, { ClientId: profileId }],
+                status: { [Op.ne]: 'terminated' }
+            }
+        });
+
+        res.json(contracts);
     },
 }
