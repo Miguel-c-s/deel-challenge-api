@@ -4,6 +4,6 @@ const router = express.Router();
 
 const contractRoutes = require('./contract.routes');
 
-router.use(contractRoutes);
+router.use('/contracts', contractRoutes);
 
 module.exports = router;
