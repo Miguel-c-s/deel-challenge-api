@@ -63,7 +63,58 @@ module.exports = {
 
     getBestClients: async (req, res, next) => {
         try {
-          
+            const { Contract, Job, Profile } = req.app.get('models');        
+            let result = undefined;
+
+            let { start, end } = req.query;
+            let { limit } = req.query;
+        
+            limit = parseInt(limit, 10) || 2;
+        
+            try { 
+                ({ startDate: start, endDate: end } = dateFilter(start, end));
+            } catch (e) {
+                return res.status(400).send(e.message);
+            }
+        
+            const jobs = await Job.findAll({
+                where: {
+                    paid: true,
+                    paymentDate: {
+                        [Op.between]: [start, end],
+                    },
+                },
+                attributes: [
+                    'Contract.Client.id',
+                    [sequelize.fn('sum', sequelize.col('price')), 'totalAmount'],
+                ],
+                group: ['Contract.Client.id'],
+                include: [
+                    {
+                        model: Contract,
+                        include: [
+                            {
+                                model: Profile,
+                                as: 'Client'
+                            }
+                        ]
+                    }
+                ],
+                order: [[sequelize.fn('sum', sequelize.col('price')), 'DESC']],
+                limit,
+                raw: true,
+                nest: true,
+            });
+
+            result = jobs.map((j) => {
+                return {
+                    id: j.Contract.Client.id,
+                    fullName: `${j.Contract.Client.firstName} ${j.Contract.Client.lastName}`,
+                    paid: j.totalAmount,
+                }
+            });
+            
+            res.json(result);
         } catch (e) {
             next(e);
         }
